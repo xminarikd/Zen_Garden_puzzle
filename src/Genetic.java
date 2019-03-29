@@ -8,13 +8,15 @@ public class Genetic {
         this.garden = garden;
     }
 
-    public void Solve(){
-
+    public void solve(){
+        garden.walkGarden(genChromosome());
     }
 
 
-    public List genChromosome(){
-        List<Integer> chromosome = new ArrayList<>();
+
+
+    public ArrayList genChromosome(){
+        ArrayList<Integer> chromosome = new ArrayList<>();
 
         for(int i = 0; i < garden.getPolObvod() * 2; i++){
             chromosome.add(i);

@@ -12,7 +12,9 @@ public class Suradnica {
         this.pohyvStlpec = pohyvStlpec;
     }
 
-
-
+    public void incrementSuradnica(){
+        riadok += pohyvStlpec;
+        stlpec += pohybRiadok;
+    }
 
 }
