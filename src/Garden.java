@@ -1,8 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import static java.lang.Math.abs;
 
 public class Garden {
     private int vyska;
@@ -24,6 +21,7 @@ public class Garden {
 //        board[5][6] = -1;
         this.sirka = sirka;
         this.vyska = vyska;
+        this.pocetKamen = pocetKamen;
         this.pocetPiesok = (vyska*sirka) - pocetKamen;
         this.polObvod = vyska + sirka;
         this.maxGene = polObvod + pocetKamen;
@@ -45,7 +43,7 @@ public class Garden {
         }
     }
 
-    public Suradnica changeDirection(Suradnica suradnica){
+    public Suradnica changeDirection(Suradnica suradnica, int[][] board){
         //hore/dole
         if(suradnica.pohybRiadok == 0){
             if((suradnica.stlpec + 1 < sirka)  &&  board[suradnica.riadok][suradnica.stlpec+1] == 0)
@@ -74,7 +72,7 @@ public class Garden {
         }
     }
 
-    public Suradnica findNewBegin(Suradnica suradnica){
+    public Suradnica findNewBegin(Suradnica suradnica,int[][] board){
         int tmp = suradnica.bIndex;
         while(true){
             tmp++;
@@ -84,33 +82,36 @@ public class Garden {
             if(tmp == suradnica.bIndex){
                 return null;
             }
-            if(canWalk(getStartindex(tmp))){
+            if(canWalk(getStartindex(tmp),board)){
                 return getStartindex(tmp);
             }
         }
     }
 
-    public void walkGarden(ArrayList chromozome){
+    public int walkGarden(ArrayList chromozome){
         Suradnica suradnica;
-        Suradnica tmpsur;
+        int[][] board = newBoard();
         boolean blocked = false;
         int poradie = 1;
         for(int i = 0; i < maxGene; i++){
             suradnica = getStartindex((int) chromozome.get(i));
             suradnica.setbIndex((int) chromozome.get(i));
-            if(!canWalk(suradnica)) {
-                suradnica = findNewBegin(suradnica);
+
+            if(!canWalk(suradnica,board)) {
+                suradnica = findNewBegin(suradnica, board);
+
+                if (suradnica == null) {
+                    System.out.println("Something wrong");
+                    break;
+                }
+                chromozome.set(i, suradnica.bIndex);
             }
-            if(suradnica == null){
-                System.out.println("Something wrong");
-                break;
-            }
-            chromozome.set(i,suradnica.bIndex);
                 while(in(suradnica)){
 
-                    if(!canWalk(suradnica)){
+                    if(!canWalk(suradnica,board)){
                         suradnica.decSuradnica();
-                        suradnica = changeDirection(suradnica);
+                        suradnica = changeDirection(suradnica,board);
+
                         if(suradnica == null){
                             blocked = true;
                             break;
@@ -126,10 +127,9 @@ public class Garden {
 
                 System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
                 System.out.println();
-
         }
-
       System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
+        return fitness(board);
     }
 
 
@@ -137,11 +137,26 @@ public class Garden {
         return (suradnica.riadok < vyska && suradnica.riadok >= 0) && (suradnica.stlpec < sirka && suradnica.stlpec >= 0);
     }
 
-
-    private boolean canWalk(Suradnica suradnica){
+    private boolean canWalk(Suradnica suradnica,int[][] board){
             return (board[suradnica.riadok][suradnica.stlpec] == 0);
     }
 
+    public int[][] newBoard(){
+        int[][] map;
+        map = Arrays.stream(board).map(int[]::clone).toArray(int[][]::new);
+        return map;
+    }
+
+    public int fitness(int[][] Board){
+        int iter = 0;
+        for(int i = 0; i < vyska; i++)
+            for(int j = 0; j < sirka; j++){
+                if(board[i][j] >= 1)
+                    iter++;
+            }
+        System.out.println("toto je fitness" + iter);
+        return iter;
+    }
 
     public int[][] getBoard() {
         return board;
