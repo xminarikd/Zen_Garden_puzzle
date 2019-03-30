@@ -17,8 +17,8 @@ public class Garden {
             for (int j = 0; j < sirka; j++) {
                 board[i][j] = 0;
             }
-//        board[1][2] = -1;
-//        board[5][6] = -1;
+        board[1][2] = -1;
+        board[5][6] = -1;
         this.sirka = sirka;
         this.vyska = vyska;
         this.pocetKamen = pocetKamen;
@@ -30,16 +30,16 @@ public class Garden {
 
     public Suradnica getStartindex(int index){
         if(index < sirka){
-            return new Suradnica(0,index,0,1, index);
+            return new Suradnica(0,index,0,1, index,null);
         }
         else if(index < vyska + sirka){
-            return new Suradnica(index - sirka,sirka-1,-1,0, index);
+            return new Suradnica(index - sirka,sirka-1,-1,0, index,null);
         }
         else if(index < (2 * sirka) + vyska){
-            return new Suradnica(vyska - 1,index - (vyska + sirka),0,-1, index);
+            return new Suradnica(vyska - 1,index - (vyska + sirka),0,-1, index,null);
         }
         else{
-            return new Suradnica(index - ((2 * sirka) + vyska),0,1,0, index);
+            return new Suradnica(index - ((2 * sirka) + vyska),0,1,0, index,null);
         }
     }
 
@@ -47,26 +47,26 @@ public class Garden {
         //hore/dole
         if(suradnica.pohybRiadok == 0){
             if((suradnica.stlpec + 1 < sirka)  &&  board[suradnica.riadok][suradnica.stlpec+1] == 0)
-                return new Suradnica(suradnica.riadok, suradnica.stlpec + 1, 1, 0);
+                return new Suradnica(suradnica.riadok, suradnica.stlpec + 1, 1, 0,suradnica.bIndex,suradnica);
 
             else if((suradnica.stlpec - 1 < sirka && suradnica.stlpec - 1 >= 0)  &&  board[suradnica.riadok][suradnica.stlpec-1] == 0)
-                return new Suradnica(suradnica.riadok, suradnica.stlpec - 1, -1, 0);
+                return new Suradnica(suradnica.riadok, suradnica.stlpec - 1, -1, 0,suradnica.bIndex,suradnica);
 
             else if(suradnica.stlpec + 1 == sirka || suradnica.stlpec - 1 < 0)
-                return new Suradnica(-1,-1,-1,-1,-1);
+                return new Suradnica(-1,-1,-1,-1,suradnica.bIndex,suradnica);
 
             else return null;
         }
         //lavo/pravo
         else{
             if((suradnica.riadok + 1 < vyska)  &&  board[suradnica.riadok+1][suradnica.stlpec] == 0)
-                return new Suradnica(suradnica.riadok + 1, suradnica.stlpec, 0, 1);
+                return new Suradnica(suradnica.riadok + 1, suradnica.stlpec, 0, 1,suradnica.bIndex,suradnica);
 
             else if((suradnica.riadok - 1 < vyska && suradnica.riadok - 1 >= 0)  &&  board[suradnica.riadok-1][suradnica.stlpec] == 0)
-                return new Suradnica(suradnica.riadok - 1, suradnica.stlpec, 0, -1);
+                return new Suradnica(suradnica.riadok - 1, suradnica.stlpec, 0, -1,suradnica.bIndex,suradnica);
 
             else if(suradnica.riadok + 1 == vyska || suradnica.riadok - 1 < 0)
-                return new Suradnica(-1,-1,-1,-1,-1);
+                return new Suradnica(-1,-1,-1,-1,suradnica.bIndex,suradnica);
 
             else return null;
         }
@@ -88,12 +88,15 @@ public class Garden {
         }
     }
 
-    public int walkGarden(ArrayList chromozome){
-        Suradnica suradnica;
+    public ArrayList walkGarden(ArrayList chromozome){
+        Suradnica suradnica = null;
+        Suradnica pred = null;
         int[][] board = newBoard();
         boolean blocked = false;
+        int fitness;
         int poradie = 1;
-        for(int i = 0; i < maxGene; i++){
+        for(int i = 0; i < chromozome.size(); i++){
+            pred = suradnica;
             suradnica = getStartindex((int) chromozome.get(i));
             suradnica.setbIndex((int) chromozome.get(i));
 
@@ -102,6 +105,7 @@ public class Garden {
 
                 if (suradnica == null) {
                     System.out.println("Something wrong");
+                    chromozome.subList(i,chromozome.size()).clear();
                     break;
                 }
                 chromozome.set(i, suradnica.bIndex);
@@ -110,13 +114,23 @@ public class Garden {
 
                     if(!canWalk(suradnica,board)){
                         suradnica.decSuradnica();
+                        pred = suradnica;
                         suradnica = changeDirection(suradnica,board);
 
                         if(suradnica == null){
+                            System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
+                            System.out.println();
+                            while(in(pred) || pred.pred != null){
+                                if((!in(pred) || board[pred.riadok][pred.stlpec] != poradie) && pred.pred != null)
+                                    pred = pred.pred;
+                                board[pred.riadok][pred.stlpec] = 0;
+                                pred.decSuradnica();
+                            }
+                            chromozome.remove(i);
                             blocked = true;
                             break;
                         }
-                        if(suradnica.bIndex == -1)
+                        if(suradnica.riadok == -1)
                             break;
                     }
 
@@ -128,8 +142,11 @@ public class Garden {
                 System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
                 System.out.println();
         }
-      System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
-        return fitness(board);
+        System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
+
+        fitness = fitness(board);
+        chromozome.add(fitness);
+        return chromozome;
     }
 
 
@@ -147,14 +164,14 @@ public class Garden {
         return map;
     }
 
-    public int fitness(int[][] Board){
+    public int fitness(int[][] board){
         int iter = 0;
         for(int i = 0; i < vyska; i++)
             for(int j = 0; j < sirka; j++){
                 if(board[i][j] >= 1)
                     iter++;
             }
-        System.out.println("toto je fitness" + iter);
+        System.out.println("toto je fitness " + iter);
         return iter;
     }
 
