@@ -24,13 +24,13 @@ public class Suradnica {
     }
 
     public void incrementSuradnica(){
-        riadok += pohyvStlpec;
-        stlpec += pohybRiadok;
+        riadok += pohybRiadok;
+        stlpec += pohyvStlpec;
     }
 
     public void decSuradnica(){
-        riadok -= pohyvStlpec;
-        stlpec -= pohybRiadok;
+        riadok -= pohybRiadok;
+        stlpec -= pohyvStlpec;
     }
 
     public void setbIndex(int bIndex) {

@@ -1,5 +1,7 @@
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Genetic {
     private Garden garden;
@@ -26,18 +28,19 @@ public class Genetic {
 
 
     public ArrayList genChromosome(){
-        ArrayList<Integer> chromosome = new ArrayList<>();
+        ArrayList<Integer> chromosome;
+        int range = (2 * garden.getPolObvod());
 
-        for(int i = 0; i < garden.getPolObvod() * 2; i++){
-            chromosome.add(i);
-        }
+        chromosome = IntStream.range(0, range).boxed().collect(Collectors.toCollection(ArrayList::new));
 
         Collections.shuffle(chromosome);
 
-       // while(chromosome.size() > garden.getMaxGene()){
-        //    chromosome.remove(chromosome.size()-1);
             chromosome.subList(garden.getMaxGene(),chromosome.size()).clear();
-      //  }
+
+        for(int i = 0; i < chromosome.size() / 2; i++){
+                chromosome.set(i,chromosome.get(i) * -1);
+        }
+        Collections.shuffle(chromosome);
 
         System.out.println(chromosome.toString());
         System.out.println(chromosome.size());

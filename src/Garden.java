@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.lang.*;
 
 public class Garden {
     private int vyska;
@@ -29,41 +30,54 @@ public class Garden {
 
 
     public Suradnica getStartindex(int index){
-        if(index < sirka){
-            return new Suradnica(0,index,0,1, index,null);
+        int idx = Math.abs(index);
+        if(idx < sirka){
+            return new Suradnica(0,idx,1,0, index,null);
         }
-        else if(index < vyska + sirka){
-            return new Suradnica(index - sirka,sirka-1,-1,0, index,null);
+        else if(idx < vyska + sirka){
+            return new Suradnica(idx - sirka,sirka-1,0,-1, index,null);
         }
-        else if(index < (2 * sirka) + vyska){
-            return new Suradnica(vyska - 1,index - (vyska + sirka),0,-1, index,null);
+        else if(idx < (2 * sirka) + vyska){
+            return new Suradnica(vyska - 1,idx - (vyska + sirka),-1,0, index,null);
         }
         else{
-            return new Suradnica(index - ((2 * sirka) + vyska),0,1,0, index,null);
+            return new Suradnica(idx - ((2 * sirka) + vyska),0,0,1, index,null);
         }
     }
 
     public Suradnica changeDirection(Suradnica suradnica, int[][] board){
         //hore/dole
-        if(suradnica.pohybRiadok == 0){
-            if((suradnica.stlpec + 1 < sirka)  &&  board[suradnica.riadok][suradnica.stlpec+1] == 0)
-                return new Suradnica(suradnica.riadok, suradnica.stlpec + 1, 1, 0,suradnica.bIndex,suradnica);
+        if(suradnica.pohyvStlpec == 0){
+                if ((suradnica.stlpec + 1 < sirka && board[suradnica.riadok][suradnica.stlpec + 1] == 0) && (suradnica.stlpec - 1 < sirka && suradnica.stlpec - 1 >= 0) && board[suradnica.riadok][suradnica.stlpec - 1] == 0) {
+                    if (suradnica.bIndex > 0)
+                        return turnRight(suradnica);
+                    else return turnLeft(suradnica);
+                }
 
-            else if((suradnica.stlpec - 1 < sirka && suradnica.stlpec - 1 >= 0)  &&  board[suradnica.riadok][suradnica.stlpec-1] == 0)
-                return new Suradnica(suradnica.riadok, suradnica.stlpec - 1, -1, 0,suradnica.bIndex,suradnica);
+                else if(suradnica.stlpec + 1 < sirka && board[suradnica.riadok][suradnica.stlpec + 1] == 0)
+                    return turnRight(suradnica);
 
-            else if(suradnica.stlpec + 1 == sirka || suradnica.stlpec - 1 < 0)
-                return new Suradnica(-1,-1,-1,-1,suradnica.bIndex,suradnica);
+                else if ((suradnica.stlpec - 1 < sirka && suradnica.stlpec - 1 >= 0) && board[suradnica.riadok][suradnica.stlpec - 1] == 0)
+                    return turnLeft(suradnica);
 
-            else return null;
-        }
+                else if (suradnica.stlpec + 1 == sirka || suradnica.stlpec - 1 < 0)
+                    return new Suradnica(-1, -1, -1, -1, suradnica.bIndex, suradnica);
+
+                else return null;
+            }
         //lavo/pravo
         else{
-            if((suradnica.riadok + 1 < vyska)  &&  board[suradnica.riadok+1][suradnica.stlpec] == 0)
-                return new Suradnica(suradnica.riadok + 1, suradnica.stlpec, 0, 1,suradnica.bIndex,suradnica);
+            if((suradnica.riadok + 1 < vyska && board[suradnica.riadok+1][suradnica.stlpec] == 0) && ((suradnica.riadok - 1 < vyska && suradnica.riadok - 1 >= 0)  &&  board[suradnica.riadok-1][suradnica.stlpec] == 0)) {
+                if (suradnica.bIndex > 0)
+                    return turnUp(suradnica);
+                else return turnDown(suradnica);
+            }
+
+            else if(suradnica.riadok + 1 < vyska && board[suradnica.riadok+1][suradnica.stlpec] == 0)
+                return turnDown(suradnica);
 
             else if((suradnica.riadok - 1 < vyska && suradnica.riadok - 1 >= 0)  &&  board[suradnica.riadok-1][suradnica.stlpec] == 0)
-                return new Suradnica(suradnica.riadok - 1, suradnica.stlpec, 0, -1,suradnica.bIndex,suradnica);
+                return turnUp(suradnica);
 
             else if(suradnica.riadok + 1 == vyska || suradnica.riadok - 1 < 0)
                 return new Suradnica(-1,-1,-1,-1,suradnica.bIndex,suradnica);
@@ -72,8 +86,24 @@ public class Garden {
         }
     }
 
+    public Suradnica turnRight(Suradnica suradnica){
+        return new Suradnica(suradnica.riadok, suradnica.stlpec + 1, 0, 1, suradnica.bIndex, suradnica);
+    }
+
+    public Suradnica turnLeft(Suradnica suradnica){
+        return new Suradnica(suradnica.riadok, suradnica.stlpec - 1, 0, -1, suradnica.bIndex, suradnica);
+    }
+
+    public Suradnica turnDown(Suradnica suradnica){
+        return new Suradnica(suradnica.riadok + 1, suradnica.stlpec, 1, 0,suradnica.bIndex,suradnica);
+    }
+
+    public Suradnica turnUp(Suradnica suradnica){
+       return new Suradnica(suradnica.riadok - 1, suradnica.stlpec, -1, 0,suradnica.bIndex,suradnica);
+    }
+
     public Suradnica findNewBegin(Suradnica suradnica,int[][] board){
-        int tmp = suradnica.bIndex;
+        int tmp = Math.abs(suradnica.bIndex);
         while(true){
             tmp++;
             if(tmp > (2*vyska + 2*sirka - 1)){
@@ -90,9 +120,8 @@ public class Garden {
 
     public ArrayList walkGarden(ArrayList chromozome){
         Suradnica suradnica = null;
-        Suradnica pred = null;
+        Suradnica pred;
         int[][] board = newBoard();
-        boolean blocked = false;
         int fitness;
         int poradie = 1;
         for(int i = 0; i < chromozome.size(); i++){
@@ -118,8 +147,8 @@ public class Garden {
                         suradnica = changeDirection(suradnica,board);
 
                         if(suradnica == null){
-                            System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
-                            System.out.println();
+//                            System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
+//                            System.out.println();
                             while(in(pred) || pred.pred != null){
                                 if((!in(pred) || board[pred.riadok][pred.stlpec] != poradie) && pred.pred != null)
                                     pred = pred.pred;
@@ -127,7 +156,7 @@ public class Garden {
                                 pred.decSuradnica();
                             }
                             chromozome.remove(i);
-                            blocked = true;
+                            poradie--;
                             break;
                         }
                         if(suradnica.riadok == -1)
@@ -139,9 +168,9 @@ public class Garden {
                 }
             poradie++;
 
-                System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
-                System.out.println();
-        }
+//                System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
+//                System.out.println();
+         }
         System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 
         fitness = fitness(board);
