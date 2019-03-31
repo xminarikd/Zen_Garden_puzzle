@@ -109,7 +109,7 @@ public class Garden {
             if(tmp > (2*vyska + 2*sirka - 1)){
                 tmp = 0;
             }
-            if(tmp == suradnica.bIndex){
+            if(tmp == Math.abs(suradnica.bIndex)){
                 return null;
             }
             if(canWalk(getStartindex(tmp),board)){
@@ -134,43 +134,43 @@ public class Garden {
 
                 if (suradnica == null) {
                     System.out.println("Something wrong");
-               //     chromozome.subList(i,chromozome.size()).clear();
+                    //     chromozome.subList(i,chromozome.size()).clear();
                     break;
                 }
                 chromozome.set(i, suradnica.bIndex);
             }
-                while(in(suradnica)){
+            while(in(suradnica)){
 
-                    if(!canWalk(suradnica,board)){
-                        suradnica.decSuradnica();
-                        pred = suradnica;
-                        suradnica = changeDirection(suradnica,board);
+                if(!canWalk(suradnica,board)){
+                    suradnica.decSuradnica();
+                    pred = suradnica;
+                    suradnica = changeDirection(suradnica,board);
 
-                        if(suradnica == null){
+                    if(suradnica == null){
 //                            System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 //                            System.out.println();
-                            while(in(pred) || pred.pred != null){
-                                if((!in(pred) || board[pred.riadok][pred.stlpec] != poradie) && pred.pred != null)
-                                    pred = pred.pred;
-                                board[pred.riadok][pred.stlpec] = 0;
-                                pred.decSuradnica();
-                            }
-                           // chromozome.remove(i);
-                            poradie--;
-                            break;
+                        while(in(pred) || pred.pred != null){
+                            if((!in(pred) || board[pred.riadok][pred.stlpec] != poradie) && pred.pred != null)
+                                pred = pred.pred;
+                            board[pred.riadok][pred.stlpec] = 0;
+                            pred.decSuradnica();
                         }
-                        if(suradnica.riadok == -1)
-                            break;
+                        // chromozome.remove(i);
+                        poradie--;
+                        break;
                     }
-
-                    board[suradnica.riadok][suradnica.stlpec] = poradie;
-                    suradnica.incrementSuradnica();
+                    if(suradnica.riadok == -1)
+                        break;
                 }
+
+                board[suradnica.riadok][suradnica.stlpec] = poradie;
+                suradnica.incrementSuradnica();
+            }
             poradie++;
 
 //                System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 //                System.out.println();
-         }
+        }
         System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 
         fitness = fitness(board);

@@ -24,12 +24,13 @@ public class Population {
 
     public Population(int POP_SIZE) {
         this.POP_SIZE = POP_SIZE;
+        individuals = new Individual[POP_SIZE];
     }
 
     public Individual getMaxFit(){
         int max = Integer.MIN_VALUE;
         int max_idx = -1;
-        for(int i =0;i<individuals.length;i++){
+        for(int i = 0; i < individuals.length; i++){
             if(max < individuals[i].getFitness()){
                 max = individuals[i].getFitness();
                 max_idx = i;
@@ -59,6 +60,13 @@ public class Population {
 //        System.out.println(chromosome.toString());
 //        System.out.println(chromosome.size());
         return chromosome;
+    }
+
+    public void walkGarden(){
+        for(int i = 0; i < POP_SIZE; i++) {
+           Individual indi = new Individual(garden.walkGarden(individuals[i].chromosome),true);
+           individuals[i] = indi;
+        }
     }
 
 

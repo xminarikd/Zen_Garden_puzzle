@@ -2,11 +2,11 @@ import java.util.Random;
 
 public class Genetic {
     private Garden garden;
-    final int POP_SIZE = 10;
-    final int TOURNAMENT_SIZE = 2;
-    final int GENERATIONS = 1000;
-    final double CROSS_RATE = 0.5;
-    final double MUTATE_RATE = 0.1;
+    final int POP_SIZE = 150;
+    final int TOURNAMENT_SIZE = 6;
+    final int GENERATIONS = 5000;
+    final double CROSS_RATE = 0.6;
+    final double MUTATE_RATE = 0.35;
 
     public Genetic(Garden garden) {
         this.garden = garden;
@@ -14,9 +14,16 @@ public class Genetic {
 
     public void solve(){
         int aktGeneration = 0;
+        Individual result = null;
         Population population = new Population(garden, POP_SIZE,true);
         System.out.println("tu som teraz");
         while (aktGeneration++ < GENERATIONS) {
+
+            if(population.getMaxFit().getFitness() == garden.getPocetPiesok()){
+                System.out.println("Nasiel som riesenie");
+                result = population.getMaxFit();
+                break;
+            }
 
             Population newpop = new Population(garden,POP_SIZE,false);
             for(int i = 0; i < POP_SIZE; i++){
@@ -25,21 +32,25 @@ public class Genetic {
                 Individual newIndi = cross(indi1,indi2);
                 newpop.setIndividuals(i,newIndi);
             }
+            for(int i = 0; i < POP_SIZE; i++){
+                mutate(newpop.getIndividual(i));
+            }
+            newpop.walkGarden();
+            newpop.getMaxFit();
 
-
+            population = newpop;
 
         }
     }
 
 
     public Individual tournament(Population population){
-       Population tournament = new Population(POP_SIZE);
+       Population tournament = new Population(TOURNAMENT_SIZE);
 
        for(int i = 0; i < TOURNAMENT_SIZE; i++){
            int tmp = (int) (Math.random() * POP_SIZE);
-           tournament.setIndividuals(i,population.getIndividual(tmp));
+           tournament.setIndividuals(i, population.getIndividual(tmp));
        }
-
         return tournament.getMaxFit();
     }
 
@@ -55,8 +66,16 @@ public class Genetic {
 
 
     public void mutate(Individual indi){
-        if(Math.random() < MUTATE_RATE){
-
+        int range = (2 * garden.getPolObvod());
+        int tmp = 1;
+        for(int i = 0; i < indi.getGeneLength(); i++) {
+            tmp = 1;
+            if(Math.random() < 0.5) {
+                tmp = -1;
+            }
+            if (Math.random() < MUTATE_RATE) {
+                indi.setGene(i, (tmp * (int) (Math.random() * range - 1)));
+            }
         }
     }
 
