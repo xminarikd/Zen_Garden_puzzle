@@ -134,7 +134,7 @@ public class Garden {
 
                 if (suradnica == null) {
                     System.out.println("Something wrong");
-                    chromozome.subList(i,chromozome.size()).clear();
+               //     chromozome.subList(i,chromozome.size()).clear();
                     break;
                 }
                 chromozome.set(i, suradnica.bIndex);
@@ -155,7 +155,7 @@ public class Garden {
                                 board[pred.riadok][pred.stlpec] = 0;
                                 pred.decSuradnica();
                             }
-                            chromozome.remove(i);
+                           // chromozome.remove(i);
                             poradie--;
                             break;
                         }
@@ -174,6 +174,7 @@ public class Garden {
         System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 
         fitness = fitness(board);
+        System.out.println(fitness);
         chromozome.add(fitness);
         return chromozome;
     }
