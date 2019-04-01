@@ -2,11 +2,11 @@ import java.util.Random;
 
 public class Genetic {
     private Garden garden;
-    final int POP_SIZE = 150;
-    final int TOURNAMENT_SIZE = 6;
+    final int POP_SIZE = 50;
+    final int TOURNAMENT_SIZE = 3;
     final int GENERATIONS = 5000;
     final double CROSS_RATE = 0.6;
-    final double MUTATE_RATE = 0.35;
+    final double MUTATE_RATE = 0.1;
 
     public Genetic(Garden garden) {
         this.garden = garden;
@@ -56,9 +56,9 @@ public class Genetic {
 
     private Individual cross(Individual indi1, Individual indi2) {
         Individual newIndi = new Individual(indi1.getChromosome(),false);
-        for (int i = 0; i < indi1.getGeneLength(); i++) {
-            if (Math.random() <= CROSS_RATE)
-                newIndi.setGene(i, indi2.getGene(i));
+        int rndPoint = (int) Math.random() * (garden.getMaxGene() - 1);
+        for (int i = 0; i < rndPoint; i++) {
+            newIndi.setGene(i, indi2.getGene(i));
         }
 
         return newIndi;
@@ -67,8 +67,9 @@ public class Genetic {
 
     public void mutate(Individual indi){
         int range = (2 * garden.getPolObvod());
+        int maxGene = garden.getMaxGene();
         int tmp = 1;
-        for(int i = 0; i < indi.getGeneLength(); i++) {
+        for(int i = 0; i < maxGene; i++) {
             tmp = 1;
             if(Math.random() < 0.5) {
                 tmp = -1;

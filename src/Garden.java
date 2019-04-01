@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.lang.*;
+import java.util.HashSet;
 
 public class Garden {
     private int vyska;
@@ -102,25 +103,39 @@ public class Garden {
        return new Suradnica(suradnica.riadok - 1, suradnica.stlpec, -1, 0,suradnica.bIndex,suradnica);
     }
 
-    public Suradnica findNewBegin(Suradnica suradnica,int[][] board){
+    public Suradnica findNewBegin(Suradnica suradnica,int[][] board, HashSet hashSet){
         int tmp = Math.abs(suradnica.bIndex);
-        while(true){
+        int tmp2;
+        int iterator = 0;
+        while(iterator++ < polObvod * 2){
             tmp++;
             if(tmp > (2*vyska + 2*sirka - 1)){
                 tmp = 0;
             }
-            if(tmp == Math.abs(suradnica.bIndex)){
-                return null;
+//            if(tmp == Math.abs(suradnica.bIndex)){
+//                return null;
+//            }
+            if(hashSet.contains(tmp) && hashSet.contains(tmp * -1)){
+                continue;
             }
-            if(canWalk(getStartindex(tmp),board)){
-                return getStartindex(tmp);
+            else if(hashSet.contains(tmp) && !hashSet.contains(tmp * -1)){
+                tmp2 = tmp * -1;
+            }
+            else{
+                tmp2 = tmp;
+            }
+
+            if(canWalk(getStartindex(tmp2),board)){
+                return getStartindex(tmp2);
             }
         }
+        return null;
     }
 
     public ArrayList walkGarden(ArrayList chromozome){
         Suradnica suradnica = null;
         Suradnica pred;
+        HashSet hashSet = new HashSet();
         int[][] board = newBoard();
         int fitness;
         int poradie = 1;
@@ -130,7 +145,7 @@ public class Garden {
             suradnica.setbIndex((int) chromozome.get(i));
 
             if(!canWalk(suradnica,board)) {
-                suradnica = findNewBegin(suradnica, board);
+                suradnica = findNewBegin(suradnica, board, hashSet);
 
                 if (suradnica == null) {
                     System.out.println("Something wrong");
@@ -154,6 +169,15 @@ public class Garden {
                                 pred = pred.pred;
                             board[pred.riadok][pred.stlpec] = 0;
                             pred.decSuradnica();
+                        }
+                        hashSet.add(pred.bIndex);
+                        Suradnica newBegin = findNewBegin(pred,board,hashSet);
+                        if(newBegin == null){
+                            break;
+                        }
+                        else{
+                            chromozome.set(i,newBegin.bIndex);
+                            i--;
                         }
                         // chromozome.remove(i);
                         poradie--;
