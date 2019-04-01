@@ -20,7 +20,7 @@ public class Garden {
                 board[i][j] = 0;
             }
         board[1][2] = -1;
-        board[5][6] = -1;
+        board[6][6] = -1;
         this.sirka = sirka;
         this.vyska = vyska;
         this.pocetKamen = pocetKamen;
@@ -132,7 +132,7 @@ public class Garden {
         return null;
     }
 
-    public ArrayList walkGarden(ArrayList chromozome){
+    public ArrayList walkGarden(ArrayList chromozome, boolean result){
         Suradnica suradnica = null;
         Suradnica pred;
         HashSet hashSet = new HashSet();
@@ -148,7 +148,7 @@ public class Garden {
                 suradnica = findNewBegin(suradnica, board, hashSet);
 
                 if (suradnica == null) {
-                    System.out.println("Something wrong");
+                   // System.out.println("Something wrong");
                     //     chromozome.subList(i,chromozome.size()).clear();
                     break;
                 }
@@ -195,7 +195,8 @@ public class Garden {
 //                System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 //                System.out.println();
         }
-        System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
+        if(result)
+           System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 
         fitness = fitness(board);
         System.out.println(fitness);
@@ -225,7 +226,7 @@ public class Garden {
                 if(board[i][j] >= 1)
                     iter++;
             }
-        System.out.println("toto je fitness " + iter);
+   //     System.out.println("toto je fitness " + iter);
         return iter;
     }
 

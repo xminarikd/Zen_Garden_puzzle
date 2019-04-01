@@ -19,8 +19,9 @@ public class Individual {
         }
     }
 
-    public Individual(){
-
+    public Individual(ArrayList chromosome, int fitness ,boolean tmp){
+        this.chromosome = chromosome;
+        this.fitness = fitness;
     }
 
     public int getFitness() {
