@@ -1,7 +1,13 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.lang.*;
 import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Garden {
     private int vyska;
@@ -19,8 +25,13 @@ public class Garden {
             for (int j = 0; j < sirka; j++) {
                 board[i][j] = 0;
             }
-        board[1][2] = -1;
-        board[6][6] = -1;
+
+        board[2][1] = -1;
+        board[4][2] = -1;
+        board[3][4] = -1;
+        board[1][5] = -1;
+        board[6][8] = -1;
+        board[6][9] = -1;
         this.sirka = sirka;
         this.vyska = vyska;
         this.pocetKamen = pocetKamen;
@@ -29,6 +40,32 @@ public class Garden {
         this.maxGene = polObvod + pocetKamen;
     }
 
+    public Garden(File file) throws IOException {
+
+        String[] line;
+        List<String> list = new ArrayList<>();
+        Stream<String> stream = Files.lines(file.toPath());
+        list = stream.collect(Collectors.toList());
+
+        line = list.get(0).split(" ");
+        this.vyska = Integer.parseInt(line[0]);
+        this.sirka = Integer.parseInt(line[1]);
+        this.pocetKamen = Integer.parseInt(line[2]);
+        this.pocetPiesok = (vyska*sirka) - pocetKamen;
+        this.polObvod = vyska + sirka;
+        this.maxGene = polObvod + pocetKamen;
+
+        this.board = new int[vyska][sirka];
+        for (int i = 0; i < vyska; i++) {
+            for (int j = 0; j < sirka; j++) {
+                board[i][j] = 0;
+            }
+        }
+        for(int i = 1; i <= pocetKamen; i++){
+            line = list.get(i).split(" ");
+            this.board[Integer.parseInt(line[0])][Integer.parseInt(line[1])] = -1;
+        }
+    }
 
     public Suradnica getStartindex(int index){
         int idx = Math.abs(index);
@@ -132,7 +169,8 @@ public class Garden {
         return null;
     }
 
-    public ArrayList walkGarden(ArrayList chromozome, boolean result){
+    public Individual walkGarden(Individual individual, boolean result, boolean findNewStart){
+        ArrayList chromozome = individual.getChromosome();
         Suradnica suradnica = null;
         Suradnica pred;
         HashSet hashSet = new HashSet();
@@ -143,13 +181,14 @@ public class Garden {
             pred = suradnica;
             suradnica = getStartindex((int) chromozome.get(i));
             suradnica.setbIndex((int) chromozome.get(i));
-
             if(!canWalk(suradnica,board)) {
-                suradnica = findNewBegin(suradnica, board, hashSet);
-
+                if(findNewStart) {
+                    suradnica = findNewBegin(suradnica, board, hashSet);
+                }
+                else{
+                    break;
+                }
                 if (suradnica == null) {
-                   // System.out.println("Something wrong");
-                    //     chromozome.subList(i,chromozome.size()).clear();
                     break;
                 }
                 chromozome.set(i, suradnica.bIndex);
@@ -162,16 +201,20 @@ public class Garden {
                     suradnica = changeDirection(suradnica,board);
 
                     if(suradnica == null){
-//                            System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
-//                            System.out.println();
                         while(in(pred) || pred.pred != null){
                             if((!in(pred) || board[pred.riadok][pred.stlpec] != poradie) && pred.pred != null)
                                 pred = pred.pred;
                             board[pred.riadok][pred.stlpec] = 0;
                             pred.decSuradnica();
                         }
+                        Suradnica newBegin;
+                        if(findNewStart){
                         hashSet.add(pred.bIndex);
-                        Suradnica newBegin = findNewBegin(pred,board,hashSet);
+                        newBegin = findNewBegin(pred,board,hashSet);
+                        }
+                        else{
+                            break;
+                        }
                         if(newBegin == null){
                             break;
                         }
@@ -179,7 +222,6 @@ public class Garden {
                             chromozome.set(i,newBegin.bIndex);
                             i--;
                         }
-                        // chromozome.remove(i);
                         poradie--;
                         break;
                     }
@@ -191,17 +233,16 @@ public class Garden {
                 suradnica.incrementSuradnica();
             }
             poradie++;
-
-//                System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
-//                System.out.println();
         }
         if(result)
            System.out.println(Arrays.deepToString(board).replaceAll("], ", "]" + System.lineSeparator()));
 
         fitness = fitness(board);
-        System.out.println(fitness);
-        chromozome.add(fitness);
-        return chromozome;
+
+        if(findNewStart){
+            return walkGarden(new Individual(chromozome,fitness,false),false,false);
+        }
+        return new Individual(chromozome,fitness,false);
     }
 
 
@@ -226,7 +267,6 @@ public class Garden {
                 if(board[i][j] >= 1)
                     iter++;
             }
-   //     System.out.println("toto je fitness " + iter);
         return iter;
     }
 
@@ -249,4 +289,5 @@ public class Garden {
     public int getMaxGene() {
         return maxGene;
     }
+
 }

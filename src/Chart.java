@@ -6,8 +6,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,18 +31,18 @@ public class Chart extends Application  {
         Chart chart = this;
         //defining the axes
         NumberAxis xAxis = new NumberAxis();
-        NumberAxis yAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis(90,115,1);
         xAxis.setLabel("Generation");
         xAxis.setAnimated(false);
         yAxis.setLabel("Fitness");
-        yAxis.setAnimated(false);
+        yAxis.setAnimated(true);
 
 
 
         lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Realtime JavaFX Charts");
-        lineChart.setAnimated(false); // disable animations
-
+        lineChart.setAnimated(true); // disable animations
+        lineChart.setCreateSymbols(false);
         //defining a series to display data
         series = new XYChart.Series<>();
         series.setName("Data Series");
@@ -73,9 +72,11 @@ public class Chart extends Application  {
             Platform.runLater(() -> {
 
                 if(tmp){
-                    lineChart.getData().add(series);
-                    tmp = false;
-                }
+                        // yAxis.setLowerBound(60);
+                        lineChart.getData().add(series);
+                        tmp = false;
+                    }
+
                // series.getData().add(new XYChart.Data<>(simpleDateFormat.format(now), random));
 
 //                if (series.getData().size() > WINDOW_SIZE)
@@ -87,9 +88,12 @@ public class Chart extends Application  {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Garden garden = new Garden(8, 12, 2);
-                Genetic genetic = new Genetic(garden, chart);
-                genetic.solve();
+                Runner runner = new Runner();
+                try {
+                    runner.start(chart);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
@@ -107,11 +111,12 @@ public class Chart extends Application  {
     }
 
     public void show(){
-        int iter = 1 + samples.size() % 200;
-        for(int i = 0; i < samples.size(); i += iter){
+       // int iter = 1 + samples.size() % 200;
+        for(int i = 1; i <= samples.size(); i += 1){
             series.getData().add(new XYChart.Data(i, samples.get(i)));
+            System.out.println("Generacia " + i + " fitness: " + samples.get(i));
         }
-        series.getData().remove(0,1);
+       // series.getData().remove(0,1);
         tmp = true;
     }
 }

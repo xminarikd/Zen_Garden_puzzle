@@ -16,11 +16,11 @@ public class Population {
         individuals = new Individual[pop_size];
         if(genrate) {
             for (int i = 0; i < pop_size; i++) {
-                Individual newindividual = new Individual(garden.walkGarden(genChromosome(),false), true);
+                Individual newindividual = new Individual(genChromosome(),0,false);
+                newindividual = garden.walkGarden(newindividual,false,true);
                 individuals[i] = newindividual;
             }
         }
-
     }
 
     public Population(int POP_SIZE) {
@@ -32,7 +32,7 @@ public class Population {
         int max = -1;
         int max_idx = -1;
         for(int i = 0; i < POP_SIZE; i++){
-            if(max <= individuals[i].getFitness()){
+            if(max < individuals[i].getFitness()){
                 max = individuals[i].getFitness();
                 max_idx = i;
             }
@@ -58,15 +58,12 @@ public class Population {
             chromosome.set(i,chromosome.get(i) * -1);
         }
         Collections.shuffle(chromosome);
-//        System.out.println(chromosome.toString());
-//        System.out.println(chromosome.size());
         return chromosome;
     }
 
     public void walkGarden(){
         for(int i = 1; i < POP_SIZE; i++) {
-           Individual indi = new Individual(garden.walkGarden(individuals[i].chromosome,false),true);
-           this.individuals[i] = indi;
+           this.individuals[i] = garden.walkGarden(individuals[i],false,true);
         }
         getMaxFit();
     }
@@ -100,5 +97,10 @@ public class Population {
         }
         this.sumFitnes = sum;
     }
+
+    public double avgFitness(){
+        return (double) (sumFitnes) / POP_SIZE;
+    }
+
 
 }

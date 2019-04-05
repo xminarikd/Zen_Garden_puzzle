@@ -1,16 +1,16 @@
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class Runner {
 
 
 
-    public static void main(String[] args){
+    public void start(Chart chart) throws IOException {
 
-//        Garden garden = new Garden(8,12,2);
-//        Genetic genetic = new Genetic(garden, chart);
-//
-//        genetic.solve();
-
+        Garden garden = new Garden(new File("tests/test02.txt"));
+        Genetic genetic = new Genetic(garden, chart);
+        genetic.solve();
 
     }
 }
