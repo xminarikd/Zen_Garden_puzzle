@@ -174,10 +174,14 @@ public class Garden {
         Suradnica suradnica = null;
         Suradnica pred;
         HashSet hashSet = new HashSet();
+        boolean blocked = false;
         int[][] board = newBoard();
         int fitness;
         int poradie = 1;
         for(int i = 0; i < chromozome.size(); i++){
+            if(blocked){
+                break;
+            }
             pred = suradnica;
             suradnica = getStartindex((int) chromozome.get(i));
             suradnica.setbIndex((int) chromozome.get(i));
@@ -199,7 +203,7 @@ public class Garden {
                     suradnica.decSuradnica();
                     pred = suradnica;
                     suradnica = changeDirection(suradnica,board);
-
+                    //TODO koncenie v strede;
                     if(suradnica == null){
                         while(in(pred) || pred.pred != null){
                             if((!in(pred) || board[pred.riadok][pred.stlpec] != poradie) && pred.pred != null)
@@ -213,6 +217,7 @@ public class Garden {
                         newBegin = findNewBegin(pred,board,hashSet);
                         }
                         else{
+                            blocked = true;
                             break;
                         }
                         if(newBegin == null){

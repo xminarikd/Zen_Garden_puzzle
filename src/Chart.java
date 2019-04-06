@@ -27,11 +27,10 @@ public class Chart extends Application  {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("JavaFX Realtime Chart Demo");
+        primaryStage.setTitle("JavaFX Realtime Chart");
         Chart chart = this;
-        //defining the axes
         NumberAxis xAxis = new NumberAxis();
-        NumberAxis yAxis = new NumberAxis(90,115,1);
+        NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Generation");
         xAxis.setAnimated(false);
         yAxis.setLabel("Fitness");
@@ -47,28 +46,15 @@ public class Chart extends Application  {
         series = new XYChart.Series<>();
         series.setName("Data Series");
 
-        // add series to chart
-//        lineChart.getData().add(series);
-
-        // setup scene
         Scene scene = new Scene(lineChart, 800, 600);
         primaryStage.setScene(scene);
 
-        // show the stage
         primaryStage.show();
 
-//        // this is used to display time in HH:mm:ss format
-//        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-
-        // setup a scheduled executor to periodically put data into the chart
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-        // put dummy data onto graph per second
         scheduledExecutorService.scheduleAtFixedRate(() -> {
-            // get a random integer between 0-10
-           // Integer random = ThreadLocalRandom.current().nextInt(20);
 
-            // Update the chart
             Platform.runLater(() -> {
 
                 if(tmp){
@@ -76,11 +62,6 @@ public class Chart extends Application  {
                         lineChart.getData().add(series);
                         tmp = false;
                     }
-
-               // series.getData().add(new XYChart.Data<>(simpleDateFormat.format(now), random));
-
-//                if (series.getData().size() > WINDOW_SIZE)
-//                    series.getData().remove(0);
             });
         }, 10, 10, TimeUnit.MILLISECONDS);
 
@@ -105,18 +86,14 @@ public class Chart extends Application  {
     }
 
     public void setSeries(int a, int b) {
-//        XYChart.Data<Integer,Integer> sample = new XYChart.Data<Integer,Integer>(a, b);
-//        samples.getData().add(sample);
        samples.put((Number) a,(Number) b);
     }
 
     public void show(){
-       // int iter = 1 + samples.size() % 200;
         for(int i = 1; i <= samples.size(); i += 1){
             series.getData().add(new XYChart.Data(i, samples.get(i)));
-            System.out.println("Generacia " + i + " fitness: " + samples.get(i));
+            //System.out.println("Generacia " + i + " fitness: " + samples.get(i));
         }
-       // series.getData().remove(0,1);
         tmp = true;
     }
 }

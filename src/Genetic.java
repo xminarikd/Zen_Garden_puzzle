@@ -1,14 +1,16 @@
-import java.util.Random;
 
 public class Genetic {
     private Garden garden;
     private Chart chart;
-    final int POP_SIZE = 200;
+    final int POP_SIZE = 250;
     final int TOURNAMENT_SIZE = 3;
     final int GENERATIONS = 6000;
     final int CROSS_METODE = 2;
+    final int ELITISM_SIZE = 20;
+    final int REFRESH_SIZE = 15;
     final int SELECTION_METODE = 2;
-    double MUTATE_RATE = 0.30;
+    final int MUTATIN_METODE = 2;
+    double MUTATE_RATE = 0.25;
 
     public Genetic(Garden garden, Chart chart) {
         this.garden = garden;
@@ -26,54 +28,37 @@ public class Genetic {
         System.out.println("Working on it ....");
         while (aktGeneration++ < GENERATIONS) {
 
-            if(population.getPopFitness() == garden.getPocetPiesok()){
+            if(population.getIndividual(0).getFitness() == garden.getPocetPiesok()){
                 System.out.println("Nasiel som riesenie");
                 System.out.println("Generacia cislo: " + aktGeneration);
-                result = population.getMaxFit();
-                System.out.println("Toto je vitaz : " + result.getFitness());
-                garden.walkGarden(result,true,false);
-                chart.setSeries(aktGeneration, population.getPopFitness());
+                System.out.println("Toto je vitaz : ");
+                garden.walkGarden(population.getIndividual(0),true,false);
+                chart.setSeries(aktGeneration, population.getIndividual(0).getFitness());
                 chart.show();
                 return;
             }
 
-            //population.getMaxFit();
             newpop = new Population(garden,POP_SIZE,false);
 
-//            maxIndi = null;
-//            maxIndi = population.getMaxFit();
-//            prevMaxFitt = maxFitt;
-//
-////            int tmp = maxIndi.getFitness();
-//            for(int i = 0 ; i < 50 ; i++) {
-//                Individual maxindi2 = garden.walkGarden(maxIndi, false);
-//                System.out.println(maxindi2.getFitness());
-//                if(maxindi2.getFitness() != tmp && i != 0){
-//                    System.out.println("errrorororo");
-//                }
-//                tmp = maxindi2.getFitness();
-//            }
+            maxIndi = null;
+            maxIndi = population.getMaxFit();
+            prevMaxFitt = maxFitt;
 
 
 
-//            if(result == null || result.getFitness() < maxFitt){
-//                result = maxIndi;
-//            }
-
-//            if(prevMaxFitt != maxFitt){
-//                MUTATE_RATE = 0.01;
-//            }
-//            else if(MUTATE_RATE < 0.6){
-//                MUTATE_RATE += 0.005;
-//            }
-
-            int tmp1 = population.getMaxFit().getFitness();
-           // System.out.println("Generacia: " + aktGeneration + "fitness " + tmp1);
-
-            newpop.setIndividuals(0,garden.walkGarden(population.getMaxFit(),false,false));
+            population.sort();
+            for(int i = 0; i < ELITISM_SIZE; i++) {
+                newpop.setIndividuals(i, garden.walkGarden(population.getIndividual(i), false, false));
+            }
+            if(aktGeneration % 29 == 0){
+                for(int i = POP_SIZE - 1; i >= POP_SIZE - REFRESH_SIZE; i--) {
+                    population.setIndividuals(i, garden.walkGarden(new Individual(population.genChromosome(),0,false),false,true));
+                }
+            }
+            population.sort();
             population.setSumFitnes();
             if(SELECTION_METODE == 1) {
-                for (int i = 1; i < POP_SIZE; i++) {
+                for (int i = ELITISM_SIZE; i < POP_SIZE; i++) {
                     Individual indi1 = tournament(population);
                     Individual indi2 = tournament(population);
                     Individual newIndi;
@@ -87,7 +72,7 @@ public class Genetic {
                 }
             }
             else if(SELECTION_METODE == 2){
-                for (int i = 1; i < POP_SIZE; i++) {
+                for (int i = ELITISM_SIZE; i < POP_SIZE; i++) {
                     Individual indi1 = roulet(population);
                     Individual indi2 = roulet(population);
                     Individual newIndi;
@@ -100,32 +85,26 @@ public class Genetic {
                     newpop.setIndividuals(i, newIndi);
                 }
             }
-            for(int i = 1; i < POP_SIZE; i++){
-                mutate(newpop.getIndividual(i));
+
+            for(int i = ELITISM_SIZE; i < POP_SIZE; i++){
+                if(MUTATIN_METODE == 1) {
+                    mutate(newpop.getIndividual(i));
+                }
+                else if(MUTATIN_METODE == 2){
+                    mutate2(newpop.getIndividual(i));
+                }
             }
 
-
-//            int tmp2 = population.getMaxFit().getFitness();
-//
-//            if(tmp1 != tmp2){
-//                System.out.println("erorooror");
-//            }
 
             newpop.walkGarden();
-            newpop.getMaxFit();
-            population.getMaxFit();
+            newpop.sort();
 
-            chart.setSeries(aktGeneration, (int) population.getPopFitness());
+            chart.setSeries(aktGeneration, newpop.getIndividual(0).getFitness());
 
-            int tmp2 = population.getMaxFit().getFitness();
-
-            if(tmp1 != tmp2){
-                System.out.println("erorooror");
-            }
             population = newpop;
         }
         System.out.println("Riesenie sa nenaslo");
-        garden.walkGarden(population.getMaxFit(),true,false);
+        garden.walkGarden(population.getIndividual(0),true,false);
         chart.show();
     }
 
@@ -135,7 +114,7 @@ public class Genetic {
 
        for(int i = 0; i < TOURNAMENT_SIZE; i++){
            int tmp = (int) (Math.random() * POP_SIZE);
-           tournament.setIndividuals(i, population.getIndividual(tmp));
+           tournament.setIndividuals(i, new Individual(population.getIndividual(i).getChromosome(),population.getIndividual(i).getFitness(),false));
        }
         return tournament.getMaxFit();
     }
@@ -190,7 +169,6 @@ public class Genetic {
                 return population.getIndividual(i);
             }
         }
-
         return population.getIndividual(0);
     }
 
@@ -205,10 +183,32 @@ public class Genetic {
                 tmp = -1;
             }
             if (Math.random() < MUTATE_RATE) {
-                indi.setGene(i, (tmp * (int) (Math.random() * range)));
+                indi.setGene(i, (int) (tmp * (Math.random() * range)));
             }
         }
     }
 
+    public void mutate2(Individual indi) {
+        int l = garden.getMaxGene();
+        if(Math.random() < MUTATE_RATE){
+            int r1 = (int) (Math.random() * l);
+            int r2 = (int) (Math.random() * l);
+
+            if (r2 < r1) {
+                int temp = r1;
+                r1 = r2;
+                r2 = temp;
+            }
+
+            int mid = r1 + ((r2 + 1) - r1) / 2;
+            int endCount = r2;
+            for (int i = r1; i < mid; i++) {
+                int tmp = indi.getGene(i);
+                indi.setGene(i, indi.getGene(endCount));
+                indi.setGene(endCount,tmp);
+                endCount--;
+            }
+        }
+    }
 
 }

@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -43,7 +45,7 @@ public class Population {
 
 
     public Individual getIndividual(int index){
-        return individuals[index];
+        return this.individuals[index];
     }
 
 
@@ -62,15 +64,18 @@ public class Population {
     }
 
     public void walkGarden(){
-        for(int i = 1; i < POP_SIZE; i++) {
+        for(int i = 0; i < POP_SIZE; i++) {
            this.individuals[i] = garden.walkGarden(individuals[i],false,true);
         }
-        getMaxFit();
+        for(int i = 0; i < POP_SIZE; i++) {
+            this.individuals[i] = garden.walkGarden(individuals[i],false,false);
+        }
+        //getMaxFit();
     }
 
 
     public Individual getIndividuals(int index) {
-        return individuals[index];
+        return this.individuals[index];
     }
 
     public void setIndividuals(int index, Individual newIndividual) {
@@ -102,5 +107,22 @@ public class Population {
         return (double) (sumFitnes) / POP_SIZE;
     }
 
+
+    public void sort(){
+
+        Collections.sort(Arrays.asList(individuals), new Comparator<Individual>() {
+            @Override
+            public int compare(Individual o1, Individual o2) {
+                if(o1.getFitness() > o2.getFitness())
+                    return -1;
+                else if(o1.getFitness() < o2.getFitness())
+                    return 1;
+                else
+                    return 0;
+            }
+        });
+
+
+    }
 
 }

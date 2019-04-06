@@ -6,18 +6,6 @@ public class Individual {
    ArrayList chromosome;
    private int geneLength;
 
-//    public Individual(ArrayList chromosome, boolean tmp) {
-//        if(tmp) {
-//            this.fitness = (int) chromosome.get(chromosome.size() - 1);
-//            chromosome.remove(chromosome.size() - 1);
-//            this.chromosome = chromosome;
-//            this.geneLength = this.chromosome.size();
-//        }
-//        else{
-//            this.fitness = 0;
-//            this.chromosome = chromosome;
-//        }
-//    }
 
     public Individual(ArrayList chromosome, int fitness ,boolean tmp){
         this.chromosome = chromosome;
