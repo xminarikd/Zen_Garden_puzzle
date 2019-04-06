@@ -1,6 +1,8 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * Trieda, ktora reprezentuje jednotlivca, jeho chromozom/geny a taktiez jeho fitnes.
+ */
 public class Individual {
    private int fitness;
    ArrayList chromosome;

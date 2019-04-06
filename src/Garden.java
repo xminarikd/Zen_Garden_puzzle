@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Trieda, ktora sluzi na definovanie zahrady, jej vysky,sirky, poctu kamenov, resp. 2d pola, ktorý ju reprezentuje.
+ */
+
 public class Garden {
     private int vyska;
     private int sirka;
@@ -40,6 +44,12 @@ public class Garden {
         this.maxGene = polObvod + pocetKamen;
     }
 
+    /**
+     * Konstruktor na vytvorenie zahrady zo suboru.
+     * @param file Súbor, ktory obsauhje testovaciu zahradu. Prvy riadok suboru obsahuje 3 cisla(vysku,sirku, pocet kamenov) dalsie obsahujú suradnice kamenov.
+     * @throws IOException
+     */
+
     public Garden(File file) throws IOException {
 
         String[] line;
@@ -67,6 +77,11 @@ public class Garden {
         }
     }
 
+    /**
+     * Metoda na získanie zaciatocneho miesta hrabania, na zaklade pociatocneho cisla.
+     * @param index Cislo, ktoré reprezentuje okraj zahrady, z ktoreho sa zacina hrabanie.
+     * @return Suradnica, ktora zahrna pociatocne miesto pohybu a taktiez smer pohybu.
+     */
     public Suradnica getStartindex(int index){
         int idx = Math.abs(index);
         if(idx < sirka){
@@ -83,6 +98,14 @@ public class Garden {
         }
     }
 
+    /**
+     * Metoda na zmenenie smeru hrabania, ak nastala situaciu narazenia na prekazku.
+     * V pripade, ak su oba smery volne vybera sa na zaklade kladnosti/zapornosti pociatocneho indexu suradnice.
+     * V pripade ak ziadna zmena smeru nie je mozná vracia sa null.
+     * @param suradnica Suradnica, pri ktorej nastalo narazenie na prekazku
+     * @param board Mapa zahrady
+     * @return Nova suradnica na pokracovanie hrabania, inak null
+     */
     public Suradnica changeDirection(Suradnica suradnica, int[][] board){
         //hore/dole
         if(suradnica.pohyvStlpec == 0){
@@ -140,6 +163,13 @@ public class Garden {
        return new Suradnica(suradnica.riadok - 1, suradnica.stlpec, -1, 0,suradnica.bIndex,suradnica);
     }
 
+    /**
+     * Metoda na získanie novej súradnice hladania, v prípade, ak v predchadzajucej bol výsledok neuspesny
+     * @param suradnica Suradnica, z ktorej sa nepodarilo hrabanie
+     * @param board Mapa zahrady
+     * @param hashSet Hashset, ktorý obsahuje zaciatky hrabania, z ktorých hrabanie bolo neuspesne.
+     * @return Nová súradnica, nový zaciatok hrabania
+     */
     public Suradnica findNewBegin(Suradnica suradnica,int[][] board, HashSet hashSet){
         int tmp = Math.abs(suradnica.bIndex);
         int tmp2;
@@ -169,6 +199,13 @@ public class Garden {
         return null;
     }
 
+    /**
+     * Metoda, ktora vykonava funkcionalitu hrabania zahrady.
+     * @param individual Jednotlivec, ktory obsahuje chromozom, podla ktoreho prebieha hladanie.
+     * @param result Boolean hodnota, ktora reprezentuje vypisovanie vysledneho hrabania.
+     * @param findNewStart Boolean hodnota, ktorá urcuje ci sa budú hladať nove zaciatky hrabania.
+     * @return Novy jedinec s novym chromozomom a fitness hodnotou
+     */
     public Individual walkGarden(Individual individual, boolean result, boolean findNewStart){
         ArrayList chromozome = individual.getChromosome();
         Suradnica suradnica = null;
@@ -250,21 +287,35 @@ public class Garden {
         return new Individual(chromozome,fitness,false);
     }
 
-
+    /**
+     *
+     * @return hodnota, ci sa suradnica nachadza vo vnutri zahrady.
+     */
     public boolean in(Suradnica suradnica){
         return (suradnica.riadok < vyska && suradnica.riadok >= 0) && (suradnica.stlpec < sirka && suradnica.stlpec >= 0);
     }
 
+    /**
+     * @return hodnota, ci sa na danom mieste v zahrade nachadza nepohrabane miesto
+     */
     private boolean canWalk(Suradnica suradnica,int[][] board){
             return (board[suradnica.riadok][suradnica.stlpec] == 0);
     }
 
+    /**
+     * @return Kopirovanie pôvodnej mapy
+     */
     public int[][] newBoard(){
         int[][] map;
         map = Arrays.stream(board).map(int[]::clone).toArray(int[][]::new);
         return map;
     }
 
+    /**
+     * Metoda, na vypocitanie fitnes, na zaklade poctu pohrabaných policok
+     * @param board Mapa zahrady
+     * @return Vracia hodnotu fitness, pre danu zahradu.
+     */
     public int fitness(int[][] board){
         int iter = 0;
         for(int i = 0; i < vyska; i++)

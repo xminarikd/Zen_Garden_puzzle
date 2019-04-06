@@ -1,30 +1,35 @@
-
+/**
+ * Trieda zabezpecujúca genetiku genetickeho algortumu
+ */
 public class Genetic {
     private Garden garden;
     private Chart chart;
-    final int POP_SIZE = 250;
-    final int TOURNAMENT_SIZE = 3;
-    final int GENERATIONS = 6000;
-    final int CROSS_METODE = 2;
-    final int ELITISM_SIZE = 20;
-    final int REFRESH_SIZE = 15;
-    final int SELECTION_METODE = 2;
-    final int MUTATIN_METODE = 2;
-    double MUTATE_RATE = 0.25;
+    final int POP_SIZE = 250;              //Velkost populacie
+    final int TOURNAMENT_SIZE = 3;         //Velkosť turnaja
+    final int GENERATIONS = 6000;          //Maximalny pocet generacii
+    final int CROSS_METODE = 2;            //Metoda krizenia 1-1point, 2-2point
+    final int ELITISM_SIZE = 20;           //Pocet elitnych jedincov v novej generacii
+    final int REFRESH_SIZE = 15;           //Pocet nahradených najhorsich jedincov
+    final int SELECTION_METODE = 2;        //Metoda vyberu 1-turnaj , 2-ruleta
+    final int MUTATIN_METODE = 2;          //Metoda mutacie 1-nah. cislo , 2-inverzia
+    double MUTATE_RATE = 0.25;             //Pravdepodobnost mutacie
 
     public Genetic(Garden garden, Chart chart) {
         this.garden = garden;
         this.chart = chart;
     }
 
+    /**
+     * Metoda genetickeho algoritmu na nájdenie riesenia problemu hrabania zen zahrady.
+     * Algoritmus sa vykonava pokym sa nenajde riesenie, alebo pokym sa nedosiahne maximalny pocet generacii
+     */
     public void solve(){
         int aktGeneration = 0;
-        int maxFitt = 0;
-        int prevMaxFitt = 0;
-        Individual result = null;
+
+        //vytvorenie pociatocnej generacie
         Population population = new Population(garden, POP_SIZE,true);
         Population newpop;
-        Individual maxIndi;
+
         System.out.println("Working on it ....");
         while (aktGeneration++ < GENERATIONS) {
 
@@ -40,16 +45,13 @@ public class Genetic {
 
             newpop = new Population(garden,POP_SIZE,false);
 
-            maxIndi = null;
-            maxIndi = population.getMaxFit();
-            prevMaxFitt = maxFitt;
-
-
-
             population.sort();
+
+            //nakopirovanie N najlepsich do novej generacie
             for(int i = 0; i < ELITISM_SIZE; i++) {
                 newpop.setIndividuals(i, garden.walkGarden(population.getIndividual(i), false, false));
             }
+            //odranenie N najhorsích kazdych 29 generacii
             if(aktGeneration % 29 == 0){
                 for(int i = POP_SIZE - 1; i >= POP_SIZE - REFRESH_SIZE; i--) {
                     population.setIndividuals(i, garden.walkGarden(new Individual(population.genChromosome(),0,false),false,true));
@@ -57,6 +59,7 @@ public class Genetic {
             }
             population.sort();
             population.setSumFitnes();
+
             if(SELECTION_METODE == 1) {
                 for (int i = ELITISM_SIZE; i < POP_SIZE; i++) {
                     Individual indi1 = tournament(population);
@@ -94,13 +97,9 @@ public class Genetic {
                     mutate2(newpop.getIndividual(i));
                 }
             }
-
-
             newpop.walkGarden();
             newpop.sort();
-
             chart.setSeries(aktGeneration, newpop.getIndividual(0).getFitness());
-
             population = newpop;
         }
         System.out.println("Riesenie sa nenaslo");
@@ -108,7 +107,12 @@ public class Genetic {
         chart.show();
     }
 
-
+    /**
+     * Metoda vyberu pomocou turnaja.
+     * Na zaklade velkosti turnaja sa vyberie pozadovany pocet jedinocu a z tychto jedincov sa vyberie ten najlepsi
+     * @param population Aktualna populacia
+     * @return jedinec vyhercom turnaja
+     */
     public Individual tournament(Population population){
        Population tournament = new Population(TOURNAMENT_SIZE);
 
@@ -119,6 +123,13 @@ public class Genetic {
         return tournament.getMaxFit();
     }
 
+    /**
+     * Metoda krizenia, na zaklade jedneho náhodného bodu.
+     * Vysledny jednotlivec ma prvu cast z jednotlivca 2 a druhu z jednotlivca 1
+     * @param indi1 Jednotlivec krizenia
+     * @param indi2 Jednotlivec krizenia
+     * @return novy jednotlivec, ktory vznikol krizenim
+     */
     private Individual cross(Individual indi1, Individual indi2) {
         Individual newIndi = new Individual(indi1.getChromosome(),0,false);
         int rndPoint = (int) (Math.random() * garden.getMaxGene());
@@ -128,14 +139,18 @@ public class Genetic {
         return newIndi;
     }
 
+    /**
+     * Metoda krizenia, na zaklade dvoch nahodnych bodov.
+     * Vysledny jednotlivec ma prvu a poslednu cast z jednotlivca 2 a prostrednu z jednotlivca 1
+     * @param indi1 Jednotlivec krizenia
+     * @param indi2 Jednotlivec krizenia
+     * @return novy jednotlivec, ktory vznikol krizenim
+     */
     private Individual cross2(Individual indi1, Individual indi2) {
         Individual newIndi = new Individual(indi1.getChromosome(),0,false);
-
         int lenght = garden.getMaxGene();
-
         int p1 = (int) (Math.random() * lenght);
         int p2 = (int) (Math.random() * lenght);
-
         if (p1 == p2){
             if(p1 == 0){
                 p2++;
@@ -144,13 +159,11 @@ public class Genetic {
                 p1--;
             }
         }
-
         if (p2 < p1) {
             int temp = p1;
             p1 = p2;
             p2 = temp;
         }
-
         for (int i = 0; i < lenght; i++) {
             if (i < p1 || i > p2) {
                 newIndi.setGene(i, indi2.getGene(i));
@@ -159,7 +172,11 @@ public class Genetic {
         return newIndi;
     }
 
-
+    /**
+     * Metoda vyberu pomocou rulety.
+     * @param population Aktualne populacia
+     * @return
+     */
     public Individual roulet(Population population){
         double point = Math.random() * population.getSumFitnes();
 
@@ -172,7 +189,10 @@ public class Genetic {
         return population.getIndividual(0);
     }
 
-
+    /**
+     * Metoda mutacie, ktorá zmeni nahodny gen na nahodne cislo
+     * @param indi Jedinec mutacie
+     */
     public void mutate(Individual indi){
         int range = (2 * garden.getPolObvod());
         int maxGene = garden.getMaxGene();
@@ -188,6 +208,11 @@ public class Genetic {
         }
     }
 
+    /**
+     * Metoda mutacie jedinca pomocou inverzie.
+     * Obratenie poradia genov medzi dvoma nahodnimi bodmi.
+     * @param indi Jedinec mutacie
+     */
     public void mutate2(Individual indi) {
         int l = garden.getMaxGene();
         if(Math.random() < MUTATE_RATE){

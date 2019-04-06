@@ -5,6 +5,10 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Trieda, ktora reprezentuje populaciu jedincou.
+ * Jednotlivci su uchovavani v poli jedincov
+ */
 public class Population {
    private Individual[] individuals;
    private int popFitness;
@@ -48,7 +52,11 @@ public class Population {
         return this.individuals[index];
     }
 
-
+    /**
+     * Generovanie nahodnoho chromozomu.
+     * Polovica týchto prvkov su zaporne, aby sa zabezpecilo nahodne zmenenie smeru.
+     * @return ArrayList obsahujúci zaciatky hladania.
+     */
     public ArrayList genChromosome(){
         ArrayList<Integer> chromosome;
         int range = (2 * garden.getPolObvod());
@@ -63,6 +71,9 @@ public class Population {
         return chromosome;
     }
 
+    /**
+     * Ziskanie fitness pre jednotlivych jednincov
+     */
     public void walkGarden(){
         for(int i = 0; i < POP_SIZE; i++) {
            this.individuals[i] = garden.walkGarden(individuals[i],false,true);
@@ -70,7 +81,6 @@ public class Population {
         for(int i = 0; i < POP_SIZE; i++) {
             this.individuals[i] = garden.walkGarden(individuals[i],false,false);
         }
-        //getMaxFit();
     }
 
 
@@ -82,13 +92,6 @@ public class Population {
         this.individuals[index] = newIndividual;
     }
 
-    public int getPopFitness() {
-        return popFitness;
-    }
-
-    public void setPopFitness(int popFitness) {
-        this.popFitness = popFitness;
-    }
 
     public int getSumFitnes() {
         return sumFitnes;
@@ -107,9 +110,10 @@ public class Population {
         return (double) (sumFitnes) / POP_SIZE;
     }
 
-
+    /**
+     * Metoda na usporiadanie jedincov na zaklade ich fitness
+     */
     public void sort(){
-
         Collections.sort(Arrays.asList(individuals), new Comparator<Individual>() {
             @Override
             public int compare(Individual o1, Individual o2) {

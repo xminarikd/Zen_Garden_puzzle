@@ -1,3 +1,6 @@
+/**
+ * Trieda, ktora reprezentuje saradnicu na mape zahrady a taktiez jej smer pohybu
+ */
 public class Suradnica {
     public int riadok;
     public int stlpec;
@@ -23,11 +26,17 @@ public class Suradnica {
         this.pred = pred;
     }
 
+    /**
+     * Pohyb vpred
+     */
     public void incrementSuradnica(){
         riadok += pohybRiadok;
         stlpec += pohyvStlpec;
     }
 
+    /**
+     * Pohyb dozadu
+     */
     public void decSuradnica(){
         riadok -= pohybRiadok;
         stlpec -= pohyvStlpec;
