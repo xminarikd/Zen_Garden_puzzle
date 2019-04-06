@@ -1,23 +1,13 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * Trieda, ktora reprezentuje jednotlivca, jeho chromozom/geny a taktiez jeho fitnes.
+ */
 public class Individual {
    private int fitness;
    ArrayList chromosome;
    private int geneLength;
 
-    public Individual(ArrayList chromosome, boolean tmp) {
-        if(tmp) {
-            this.fitness = (int) chromosome.get(chromosome.size() - 1);
-            chromosome.remove(chromosome.size() - 1);
-            this.chromosome = chromosome;
-            this.geneLength = this.chromosome.size();
-        }
-        else{
-            this.fitness = 0;
-            this.chromosome = chromosome;
-        }
-    }
 
     public Individual(ArrayList chromosome, int fitness ,boolean tmp){
         this.chromosome = chromosome;
