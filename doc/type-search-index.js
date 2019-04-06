@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"<Unnamed>","l":"Chart"},{"p":"<Unnamed>","l":"Garden"},{"p":"<Unnamed>","l":"Genetic"},{"p":"<Unnamed>","l":"Individual"},{"p":"<Unnamed>","l":"Population"},{"p":"<Unnamed>","l":"Runner"},{"p":"<Unnamed>","l":"Suradnica"}]

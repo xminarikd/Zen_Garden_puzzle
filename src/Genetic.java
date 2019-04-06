@@ -1,30 +1,33 @@
 /**
- * Trieda zabezpecujúca genetiku genetickeho algortumu
+ * Trieda zabezpecujuca genetiku genetickeho algortumu
  */
 public class Genetic {
     private Garden garden;
     private Chart chart;
-    final int POP_SIZE = 250;              //Velkost populacie
-    final int TOURNAMENT_SIZE = 3;         //Velkosť turnaja
-    final int GENERATIONS = 6000;          //Maximalny pocet generacii
-    final int CROSS_METODE = 2;            //Metoda krizenia 1-1point, 2-2point
-    final int ELITISM_SIZE = 20;           //Pocet elitnych jedincov v novej generacii
-    final int REFRESH_SIZE = 15;           //Pocet nahradených najhorsich jedincov
-    final int SELECTION_METODE = 2;        //Metoda vyberu 1-turnaj , 2-ruleta
-    final int MUTATIN_METODE = 2;          //Metoda mutacie 1-nah. cislo , 2-inverzia
-    double MUTATE_RATE = 0.25;             //Pravdepodobnost mutacie
+    private Runner runner;
+    public static final int POP_SIZE = 175;              //Velkost populacie
+    public static int TOURNAMENT_SIZE = 2;         //Velkosť turnaja
+    public static final int GENERATIONS = 2500;          //Maximalny pocet generacii
+    public  int CROSS_METODE = 1;            //Metoda krizenia 1-1point, 2-2point
+    public static final  int ELITISM_SIZE = 15;           //Pocet elitnych jedincov v novej generacii
+    public static final int REFRESH_SIZE = 20;           //Pocet nahradených najhorsich jedincov
+    public  int SELECTION_METODE = 1;        //Metoda vyberu 1-turnaj , 2-ruleta
+    public  int MUTATIN_METODE = 2;          //Metoda mutacie 1-nah. cislo , 2-inverzia
+    final double  MUTATE_RATE = 0.275;             //Pravdepodobnost mutacie
 
-    public Genetic(Garden garden, Chart chart) {
+    public Genetic(Garden garden, Chart chart, Runner runner) {
         this.garden = garden;
         this.chart = chart;
+        this.runner = runner;
     }
 
     /**
-     * Metoda genetickeho algoritmu na nájdenie riesenia problemu hrabania zen zahrady.
+     * Metoda genetickeho algoritmu na najdenie riesenia problemu hrabania zen zahrady.
      * Algoritmus sa vykonava pokym sa nenajde riesenie, alebo pokym sa nedosiahne maximalny pocet generacii
      */
     public void solve(){
         int aktGeneration = 0;
+        int avgFitnes = 0;
 
         //vytvorenie pociatocnej generacie
         Population population = new Population(garden, POP_SIZE,true);
@@ -37,9 +40,10 @@ public class Genetic {
                 System.out.println("Nasiel som riesenie");
                 System.out.println("Generacia cislo: " + aktGeneration);
                 System.out.println("Toto je vitaz : ");
-                garden.walkGarden(population.getIndividual(0),true,false);
-                chart.setSeries(aktGeneration, population.getIndividual(0).getFitness());
-                chart.show();
+                garden.walkGarden(population.getIndividual(0),true,true);
+                runner.arrayList.add(new Results(aktGeneration,avgFitnes,SELECTION_METODE,CROSS_METODE));
+                //chart.setSeries(aktGeneration, population.getIndividual(0).getFitness());
+               // chart.show();
                 return;
             }
 
@@ -59,12 +63,13 @@ public class Genetic {
             }
             population.sort();
             population.setSumFitnes();
+            avgFitnes = (int) ((avgFitnes + population.avgFitness()) / 2);
 
             if(SELECTION_METODE == 1) {
                 for (int i = ELITISM_SIZE; i < POP_SIZE; i++) {
                     Individual indi1 = tournament(population);
                     Individual indi2 = tournament(population);
-                    Individual newIndi;
+                    Individual newIndi = null;
                     if(CROSS_METODE == 1) {
                         newIndi = cross(indi1, indi2);
                     }
@@ -78,7 +83,7 @@ public class Genetic {
                 for (int i = ELITISM_SIZE; i < POP_SIZE; i++) {
                     Individual indi1 = roulet(population);
                     Individual indi2 = roulet(population);
-                    Individual newIndi;
+                    Individual newIndi = null;
                     if(CROSS_METODE == 1) {
                         newIndi = cross(indi1, indi2);
                     }
@@ -99,12 +104,14 @@ public class Genetic {
             }
             newpop.walkGarden();
             newpop.sort();
-            chart.setSeries(aktGeneration, newpop.getIndividual(0).getFitness());
+            //chart.setSeries(aktGeneration, newpop.getIndividual(0).getFitness());
             population = newpop;
         }
         System.out.println("Riesenie sa nenaslo");
-        garden.walkGarden(population.getIndividual(0),true,false);
-        chart.show();
+        garden.walkGarden(population.getIndividual(0),true,true);
+        runner.arrayList.add(new Results(aktGeneration,avgFitnes,SELECTION_METODE,CROSS_METODE));
+       // chart.setSeries(aktGeneration, population.getIndividual(0).getFitness());
+        //chart.show();
     }
 
     /**
@@ -175,7 +182,7 @@ public class Genetic {
     /**
      * Metoda vyberu pomocou rulety.
      * @param population Aktualne populacia
-     * @return
+     * @return jednotlivec vytazom rulety
      */
     public Individual roulet(Population population){
         double point = Math.random() * population.getSumFitnes();

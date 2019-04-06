@@ -54,8 +54,8 @@ public class Population {
 
     /**
      * Generovanie nahodnoho chromozomu.
-     * Polovica týchto prvkov su zaporne, aby sa zabezpecilo nahodne zmenenie smeru.
-     * @return ArrayList obsahujúci zaciatky hladania.
+     * Polovica tychto prvkov su zaporne, aby sa zabezpecilo nahodne zmenenie smeru.
+     * @return ArrayList obsahujuci zaciatky hladania.
      */
     public ArrayList genChromosome(){
         ArrayList<Integer> chromosome;

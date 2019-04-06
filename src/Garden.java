@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Trieda, ktora sluzi na definovanie zahrady, jej vysky,sirky, poctu kamenov, resp. 2d pola, ktorý ju reprezentuje.
+ * Trieda, ktora sluzi na definovanie zahrady, jej vysky,sirky, poctu kamenov, resp. 2d pola, ktory ju reprezentuje.
  */
 
 public class Garden {
@@ -46,7 +46,7 @@ public class Garden {
 
     /**
      * Konstruktor na vytvorenie zahrady zo suboru.
-     * @param file Súbor, ktory obsauhje testovaciu zahradu. Prvy riadok suboru obsahuje 3 cisla(vysku,sirku, pocet kamenov) dalsie obsahujú suradnice kamenov.
+     * @param file Subor, ktory obsauhje testovaciu zahradu. Prvy riadok suboru obsahuje 3 cisla(vysku,sirku, pocet kamenov) dalsie obsahuju suradnice kamenov.
      * @throws IOException
      */
 
@@ -78,8 +78,8 @@ public class Garden {
     }
 
     /**
-     * Metoda na získanie zaciatocneho miesta hrabania, na zaklade pociatocneho cisla.
-     * @param index Cislo, ktoré reprezentuje okraj zahrady, z ktoreho sa zacina hrabanie.
+     * Metoda na ziskanie zaciatocneho miesta hrabania, na zaklade pociatocneho cisla.
+     * @param index Cislo, ktore reprezentuje okraj zahrady, z ktoreho sa zacina hrabanie.
      * @return Suradnica, ktora zahrna pociatocne miesto pohybu a taktiez smer pohybu.
      */
     public Suradnica getStartindex(int index){
@@ -164,11 +164,11 @@ public class Garden {
     }
 
     /**
-     * Metoda na získanie novej súradnice hladania, v prípade, ak v predchadzajucej bol výsledok neuspesny
+     * Metoda na ziskanie novej suradnice hladania, v pripade, ak v predchadzajucej bol vysledok neuspesny
      * @param suradnica Suradnica, z ktorej sa nepodarilo hrabanie
      * @param board Mapa zahrady
-     * @param hashSet Hashset, ktorý obsahuje zaciatky hrabania, z ktorých hrabanie bolo neuspesne.
-     * @return Nová súradnica, nový zaciatok hrabania
+     * @param hashSet Hashset, ktory obsahuje zaciatky hrabania, z ktorých hrabanie bolo neuspesne.
+     * @return Nová suradnica, novy zaciatok hrabania
      */
     public Suradnica findNewBegin(Suradnica suradnica,int[][] board, HashSet hashSet){
         int tmp = Math.abs(suradnica.bIndex);
@@ -203,7 +203,7 @@ public class Garden {
      * Metoda, ktora vykonava funkcionalitu hrabania zahrady.
      * @param individual Jednotlivec, ktory obsahuje chromozom, podla ktoreho prebieha hladanie.
      * @param result Boolean hodnota, ktora reprezentuje vypisovanie vysledneho hrabania.
-     * @param findNewStart Boolean hodnota, ktorá urcuje ci sa budú hladať nove zaciatky hrabania.
+     * @param findNewStart Boolean hodnota, ktorá urcuje ci sa budu hladat nove zaciatky hrabania.
      * @return Novy jedinec s novym chromozomom a fitness hodnotou
      */
     public Individual walkGarden(Individual individual, boolean result, boolean findNewStart){
@@ -303,7 +303,7 @@ public class Garden {
     }
 
     /**
-     * @return Kopirovanie pôvodnej mapy
+     * @return Kopirovanie povodnej mapy
      */
     public int[][] newBoard(){
         int[][] map;
