@@ -5,13 +5,13 @@ public class Genetic {
     private Garden garden;
     private Chart chart;
     private Runner runner;
-    public static final int POP_SIZE = 175;              //Velkost populacie
+    public static final int POP_SIZE = 100;              //Velkost populacie
     public static int TOURNAMENT_SIZE = 2;         //Velkosť turnaja
-    public static final int GENERATIONS = 2500;          //Maximalny pocet generacii
-    public  int CROSS_METODE = 1;            //Metoda krizenia 1-1point, 2-2point
+    public static final int GENERATIONS = 50;          //Maximalny pocet generacii
+    public  int CROSS_METODE = 2;            //Metoda krizenia 1-1point, 2-2point
     public static final  int ELITISM_SIZE = 15;           //Pocet elitnych jedincov v novej generacii
     public static final int REFRESH_SIZE = 20;           //Pocet nahradených najhorsich jedincov
-    public  int SELECTION_METODE = 1;        //Metoda vyberu 1-turnaj , 2-ruleta
+    public  int SELECTION_METODE = 2;        //Metoda vyberu 1-turnaj , 2-ruleta
     public  int MUTATIN_METODE = 2;          //Metoda mutacie 1-nah. cislo , 2-inverzia
     final double  MUTATE_RATE = 0.275;             //Pravdepodobnost mutacie
 
@@ -102,6 +102,10 @@ public class Genetic {
                     mutate2(newpop.getIndividual(i));
                 }
             }
+
+          //  population.sort();
+          //  System.out.println(aktGeneration + ";" + population.avgFitness() + ";" + population.getIndividual(POP_SIZE-1).getFitness() + ";" + population.getIndividual(0).getFitness());
+
             newpop.walkGarden();
             newpop.sort();
             //chart.setSeries(aktGeneration, newpop.getIndividual(0).getFitness());
@@ -125,7 +129,7 @@ public class Genetic {
 
        for(int i = 0; i < TOURNAMENT_SIZE; i++){
            int tmp = (int) (Math.random() * POP_SIZE);
-           tournament.setIndividuals(i, new Individual(population.getIndividual(i).getChromosome(),population.getIndividual(i).getFitness(),false));
+           tournament.setIndividuals(i, new Individual(population.getIndividual(tmp).getChromosome(),population.getIndividual(tmp).getFitness(),false));
        }
         return tournament.getMaxFit();
     }

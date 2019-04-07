@@ -1,9 +1,9 @@
 public class Results {
-    int cisloriesenia;
-    int pocetgeneracii;
-    int avgFitt;
-    int selectionmetode;
-    int crossmetode;
+    public int cisloriesenia;
+    public int pocetgeneracii;
+    public int avgFitt;
+    public int selectionmetode;
+    public int crossmetode;
 
     public Results(int pocetgeneracii, int avgFitt, int selectionmetode, int crossmetode) {
         this.pocetgeneracii = pocetgeneracii;
